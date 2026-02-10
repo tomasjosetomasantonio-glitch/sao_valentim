@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-br">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Feliz Sao Valentim</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#d41132",
+                        "gold": "#D4AF37",
+                        "parchment": "#fdfcf0",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221013",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Serif", "serif"],
+                        "handwriting": ["Dancing Script", "cursive"],
+                        "elegant": ["Great Vibes", "cursive"],
+                        "accent": ["Cormorant Garamond", "serif"]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24
+        }
+
+        .silk-texture {
+            background-image: radial-gradient(circle at 50% 50%, rgba(34, 16, 19, 0.7) 0%, rgba(20, 5, 8, 0.95) 100%);
+            background-color: #221013;
+        }
+
+        .parchment-texture {
+            background-color: #fcf8f0;
+            background-image: url("https://www.transparenttextures.com/patterns/beige-paper.png");
+        }
+
+        .polaroid-tilt-left {
+            transform: rotate(-2deg);
+        }
+
+        .polaroid-tilt-right {
+            transform: rotate(2deg);
+        }
+
+        .timeline-line {
+            background: linear-gradient(to bottom, transparent, #D4AF37 15%, #D4AF37 85%, transparent);
+        }
+
+        .gold-flourish {
+            filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.4));
+        }
+
+        /* --- EFEITO DE CORAÇÕES --- */
+        .heart-particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 100;
+            color: #d41132;
+            animation: floatUp linear forwards;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100vh) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        /* --- ESTILOS PARA FOTOS --- */
+        .foto-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .foto-container img {
+            transition: all 0.5s ease;
+        }
+
+        .foto-container:hover img {
+            transform: scale(1.05);
+            filter: grayscale(0%) !important;
+        }
+
+        .foto-loading {
+            background: linear-gradient(90deg, #2d1b1f 25%, #3a2529 50%, #2d1b1f 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        /* --- MODAL --- */
+        .modal-entrada {
+            animation: modalEntrada 0.3s ease-out;
+        }
+
+        @keyframes modalEntrada {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-background-dark font-display text-white overflow-x-hidden" onclick="spawnHeart(event)">
+
+    <section id="inicio" class="relative h-screen w-full flex flex-col silk-texture overflow-hidden">
+        <!-- Elementos decorativos -->
+        <div class="absolute top-8 left-8 text-gold gold-flourish opacity-40">
+            <svg fill="currentColor" height="100" viewBox="0 0 100 100" width="100">
+                <path d="M0,0 C20,0 40,10 50,30 C60,50 50,80 30,90 C10,100 0,80 0,60 L0,0 Z"></path>
+            </svg>
+        </div>
+        <div class="absolute top-8 right-8 text-gold gold-flourish opacity-40 rotate-90">
+            <svg fill="currentColor" height="100" viewBox="0 0 100 100" width="100">
+                <path d="M0,0 C20,0 40,10 50,30 C60,50 50,80 30,90 C10,100 0,80 0,60 L0,0 Z"></path>
+            </svg>
+        </div>
+
+        <!-- Foto de capa principal -->
+        <div class="absolute inset-0 z-0">
+            <div id="foto-capa-container" class="w-full h-full foto-loading">
+                <span class="material-symbols-outlined text-4xl">photo</span>
+            </div>
+        </div>
+
+        <header class="relative z-10 flex items-center justify-between px-4 md:px-12 py-6 md:py-8">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-primary text-2xl md:text-3xl">favorite</span>
+                <span class="text-white text-base md:text-lg tracking-[0.2em] font-light uppercase">Amor Eterno</span>
+            </div>
+            <nav class="hidden md:flex gap-6 lg:gap-10">
+                <a class="text-white/70 hover:text-gold text-sm tracking-widest uppercase transition-colors"
+                    href="#timeline">Linha do Tempo</a>
+                <a class="text-white/70 hover:text-gold text-sm tracking-widest uppercase transition-colors"
+                    href="#cartas">Mensagens</a>
+                <a class="text-white/70 hover:text-gold text-sm tracking-widest uppercase transition-colors"
+                    href="#galeria">Galeria</a>
+            </nav>
+            <button id="menu-mobile" class="md:hidden text-white">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+        </header>
+
+        <main class="flex-1 flex flex-col items-center justify-center text-center px-4 z-10 relative">
+            <p class="text-gold uppercase tracking-[0.4em] text-xs md:text-sm mb-4 md:mb-6 opacity-80">Desde o primeiro
+                dia</p>
+            <h1 class="text-white text-4xl md:text-6xl lg:text-8xl font-black italic mb-6 md:mb-8">
+                Para o meu <br /><span class="not-italic">Grande Amor</span>
+            </h1>
+            <p
+                class="text-white/80 text-base md:text-lg lg:text-xl font-light italic max-w-xl mx-auto leading-relaxed mb-8 md:mb-10">
+                "Cada batida do meu coração sussurra o seu nome."
+            </p>
+            <a href="#timeline"
+                class="px-8 md:px-12 py-3 md:py-5 bg-primary text-white text-sm md:text-lg font-bold tracking-widest uppercase rounded-lg hover:scale-105 transition-all shadow-[0_0_20px_rgba(212,17,50,0.4)]">
+                Nossa História
+            </a>
+        </main>
+
+        <!-- Contador de fotos -->
+        <div class="absolute bottom-8 right-8 z-10 bg-black/30 backdrop-blur-sm rounded-full px-4 py-2">
+            <span class="text-xs text-white/70">Fotos carregadas: <span id="contador-fotos">0</span></span>
+        </div>
+    </section>
+
+    <section id="timeline" class="bg-background-dark py-16 md:py-24 relative">
+        <div class="text-center mb-12 md:mb-20">
+            <span class="text-gold font-handwriting text-2xl md:text-3xl">Nossos momentos...</span>
+            <h2 class="text-white text-3xl md:text-5xl font-bold mt-2">Linha do Tempo</h2>
+            <p class="text-white/60 mt-4 max-w-2xl mx-auto" id="status-timeline">Carregando memórias...</p>
+        </div>
+
+        <div class="relative max-w-5xl mx-auto px-4">
+            <div class="absolute left-1/2 transform -translate-x-1/2 w-0.5 h-full timeline-line"></div>
+
+            <!-- Container da timeline -->
+            <div id="timeline-container" class="space-y-16 md:space-y-24">
+                <!-- As fotos serão inseridas aqui pelo JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO: GALERIA -->
+    <section id="galeria" class="bg-background-dark py-16 md:py-24 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-12 md:mb-20">
+                <span class="text-gold font-handwriting text-2xl md:text-3xl">Nossas memórias</span>
+                <h2 class="text-white text-3xl md:text-5xl font-bold mt-2">Galeria de Fotos</h2>
+                <p class="text-white/60 mt-4 max-w-2xl mx-auto" id="status-galeria">Preparando galeria...</p>
+            </div>
+
+            <!-- Filtros de Galeria -->
+            <div class="flex flex-wrap justify-center gap-3 mb-10" id="filtros-container" style="display: none;">
+                <button
+                    class="filtro-galeria px-4 py-2 bg-primary text-white rounded-full text-sm font-medium transition-all"
+                    data-filtro="todas">Todas</button>
+                <button
+                    class="filtro-galeria px-4 py-2 bg-white/10 text-white rounded-full text-sm font-medium hover:bg-white/20 transition-all"
+                    data-filtro="especiais">Especiais</button>
+                <button
+                    class="filtro-galeria px-4 py-2 bg-white/10 text-white rounded-full text-sm font-medium hover:bg-white/20 transition-all"
+                    data-filtro="viagens">Viagens</button>
+                <button
+                    class="filtro-galeria px-4 py-2 bg-white/10 text-white rounded-full text-sm font-medium hover:bg-white/20 transition-all"
+                    data-filtro="casual">Casual</button>
+            </div>
+
+            <!-- Grid de Fotos -->
+            <div id="galeria-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- Fotos serão carregadas aqui dinamicamente -->
+            </div>
+
+            <!-- Modal para visualização de foto -->
+            <div id="modal-foto" class="fixed inset-0 bg-black/90 z-50 hidden items-center justify-center p-4">
+                <div class="relative max-w-4xl w-full modal-entrada">
+                    <button id="fechar-modal"
+                        class="absolute -top-12 right-0 text-white text-3xl hover:text-gold transition-colors p-2 cursor-pointer z-50">✕</button>
+                    <div class="relative">
+                        <div id="modal-loading"
+                            class="absolute inset-0 bg-black/50 flex items-center justify-center hidden">
+                            <div class="text-white text-xl">Carregando...</div>
+                        </div>
+                        <img id="modal-imagem" class="w-full h-auto max-h-[80vh] object-contain rounded-lg" src=""
+                            alt="">
+                    </div>
+                    <div id="modal-legenda" class="text-white text-center mt-4 text-lg font-handwriting"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="cartas" class="bg-background-light text-background-dark py-16 md:py-24 px-4 relative">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-12 md:mb-16">
+                <h2 class="text-3xl md:text-4xl font-accent font-bold uppercase tracking-widest">Mural de Afeto</h2>
+                <div class="w-20 md:w-24 h-1 bg-primary/30 mx-auto mt-4"></div>
+            </div>
+
+            <div class="mb-8 md:mb-12 max-w-lg mx-auto bg-white p-4 md:p-6 rounded-xl shadow-md border border-gray-100">
+                <textarea id="textoMsg"
+                    class="w-full border-gray-200 rounded-lg p-3 text-sm italic mb-4 focus:ring-primary focus:border-primary"
+                    placeholder="Escreva uma mensagem para o banco de dados..."></textarea>
+                <button onclick="salvarNoSQL()"
+                    class="w-full bg-primary text-white py-2 rounded-full font-bold uppercase text-xs tracking-widest hover:bg-red-700 transition-all">Salvar</button>
+            </div>
+
+            <div id="muralSql" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-12 md:mb-16">
+                <!-- Mensagens do banco de dados aparecerão aqui -->
+            </div>
+
+            <article class="parchment-texture p-8 md:p-10 lg:p-20 shadow-2xl border border-gray-200 relative">
+                <div class="absolute top-8 md:top-10 right-8 md:right-10 opacity-10">
+                    <span class="material-symbols-outlined text-6xl md:text-8xl">lovehost</span>
+                </div>
+                <div class="font-handwriting text-xl md:text-2xl lg:text-3xl leading-relaxed space-y-6 md:space-y-8">
+                    <p class="font-accent text-xs md:text-sm uppercase tracking-[0.3em] text-gray-500">14 de Fevereiro,
+                        2026</p>
+                    <p>Meu amor,</p>
+                    <p>Escrever para você é como tentar colocar o infinito em palavras. Cada dia ao seu lado é uma
+                        descoberta de que o amor pode sim ser leve, profundo e eterno ao mesmo tempo.</p>
+                    <p>Obrigado por ser meu porto seguro e minha maior aventura.</p>
+                    <div class="pt-8 md:pt-10 text-right">
+                        <p class="text-2xl md:text-3xl lg:text-4xl font-elegant">Com todo o meu amor,</p>
+                        <p class="font-bold mt-2 underline decoration-gold decoration-2">Para sempre seu.</p>
+                    </div>
+                </div>
+            </article>
+
+            <div class="flex flex-wrap justify-center gap-3 md:gap-4 mt-8 md:mt-12">
+                <button
+                    class="px-6 md:px-8 py-2 md:py-3 bg-primary text-white rounded-full font-bold hover:bg-red-700 transition-all shadow-lg text-sm md:text-base">Responder
+                    Carta</button>
+                <button onclick="window.print()"
+                    class="px-6 md:px-8 py-2 md:py-3 border border-primary text-primary rounded-full font-bold hover:bg-primary/5 transition-all text-sm md:text-base">Guardar
+                    em PDF</button>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-background-dark py-8 md:py-12 text-center border-t border-gold/10">
+        <span class="material-symbols-outlined text-primary mb-3 md:mb-4">favorite</span>
+        <p class="text-gold/50 text-xs tracking-widest uppercase">Criado com amor • 2026</p>
+        <p class="text-white/30 text-xs mt-2" id="info-fotos">Carregando informações das fotos...</p>
+    </footer>
+
+    <script>
+        // ============================================
+        // SISTEMA DE DETECÇÃO DE FOTOS
+        // ============================================
+
+        // Lista de possíveis fotos (nomes que o sistema vai tentar encontrar)
+        const fotosPossiveis = {
+            timeline: [
+                { nome: 'capa.jpg', titulo: 'Nosso amor', descricao: 'A foto que diz tudo', lado: 'direita' },
+                { nome: 'primeiro-encontro.jpg', titulo: 'Onde tudo começou...', descricao: 'Nosso primeiro encontro inesquecível', lado: 'direita' },
+                { nome: 'primeira-viagem.jpg', titulo: 'Nossa primeira viagem', descricao: 'A primeira aventura juntos', lado: 'esquerda' },
+                { nome: 'jantar-especial.jpg', titulo: 'Aquele jantar especial', descricao: 'Celebrando nosso primeiro ano', lado: 'direita' },
+                { nome: 'risadas.jpg', titulo: 'Risadas sem fim', descricao: 'Momentos de pura alegria', lado: 'esquerda' },
+                { nome: 'lugar-favorito.jpg', titulo: 'Nosso lugar favorito', descricao: 'Onde nos sentimos em casa', lado: 'direita' },
+                { nome: 'sempre-nos.jpg', titulo: 'Para sempre nós', descricao: 'O começo do nosso sempre', lado: 'esquerda' },
+                // Outros nomes possíveis
+                { nome: 'foto1.jpg', titulo: 'Momento especial', descricao: 'Um dia inesquecível', lado: 'direita' },
+                { nome: 'foto2.jpg', titulo: 'Aventura juntos', descricao: 'Explorando o mundo', lado: 'esquerda' },
+                { nome: 'foto3.jpg', titulo: 'Celebração', descricao: 'Comemorando nossa união', lado: 'direita' },
+                { nome: 'foto4.jpg', titulo: 'Dia comum, amor extraordinário', descricao: 'Os pequenos momentos', lado: 'esquerda' }
+            ],
+            galeria: [
+                { nome: 'galeria1.jpg', categoria: 'especiais', titulo: 'Pôr do sol especial' },
+                { nome: 'galeria2.jpg', categoria: 'viagens', titulo: 'Praia dos sonhos' },
+                { nome: 'galeria3.jpg', categoria: 'casual', titulo: 'Café da manhã' },
+                { nome: 'galeria4.jpg', categoria: 'especiais', titulo: 'Aniversário' },
+                { nome: 'galeria5.jpg', categoria: 'viagens', titulo: 'Montanhas' },
+                { nome: 'galeria6.jpg', categoria: 'casual', titulo: 'Em casa' },
+                { nome: 'galeria7.jpg', categoria: 'especiais', titulo: 'Celebração' },
+                { nome: 'galeria8.jpg', categoria: 'viagens', titulo: 'Aventura' },
+                // Outros nomes possíveis
+                { nome: 'g1.jpg', categoria: 'especiais', titulo: 'Momento romântico' },
+                { nome: 'g2.jpg', categoria: 'viagens', titulo: 'Passeio' },
+                { nome: 'g3.jpg', categoria: 'casual', titulo: 'Dia a dia' },
+                { nome: 'g4.jpg', categoria: 'especiais', titulo: 'Data especial' }
+            ]
+        };
+
+        // Array para armazenar fotos encontradas
+        let fotosEncontradas = {
+            timeline: [],
+            galeria: []
+        };
+
+        // ============================================
+        // FUNÇÕES PRINCIPAIS
+        // ============================================
+
+        // Função para testar se uma imagem existe
+        function testarImagem(url) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => resolve({ url, existe: true, width: img.naturalWidth, height: img.naturalHeight });
+                img.onerror = () => resolve({ url, existe: false });
+                img.src = url;
+
+                // Timeout para evitar espera infinita
+                setTimeout(() => resolve({ url, existe: false }), 2000);
+            });
+        }
+
+        // Função para descobrir quais fotos existem
+        async function descobrirFotos() {
+            console.log('🔍 Procurando fotos...');
+
+            const resultados = {
+                timeline: [],
+                galeria: []
+            };
+
+            // Testar fotos da timeline
+            for (const foto of fotosPossiveis.timeline) {
+                const caminhos = [
+                    `fotos/${foto.nome}`,
+                    `./fotos/${foto.nome}`,
+                    `/${foto.nome}`,
+                    `${foto.nome}`
+                ];
+
+                for (const caminho of caminhos) {
+                    const resultado = await testarImagem(caminho);
+                    if (resultado.existe) {
+                        resultados.timeline.push({
+                            ...foto,
+                            caminho: caminho,
+                            tamanho: `${resultado.width}x${resultado.height}`
+                        });
+                        console.log(`✅ Encontrada: ${foto.nome} em ${caminho}`);
+                        break; // Para de testar outros caminhos para esta foto
+                    }
+                }
+            }
+
+            // Testar fotos da galeria
+            for (const foto of fotosPossiveis.galeria) {
+                const caminhos = [
+                    `fotos/${foto.nome}`,
+                    `./fotos/${foto.nome}`,
+                    `/${foto.nome}`,
+                    `${foto.nome}`
+                ];
+
+                for (const caminho of caminhos) {
+                    const resultado = await testarImagem(caminho);
+                    if (resultado.existe) {
+                        resultados.galeria.push({
+                            ...foto,
+                            caminho: caminho,
+                            tamanho: `${resultado.width}x${resultado.height}`
+                        });
+                        console.log(`✅ Encontrada: ${foto.nome} em ${caminho}`);
+                        break;
+                    }
+                }
+            }
+
+            fotosEncontradas = resultados;
+            return resultados;
+        }
+
+        // Função para carregar foto de capa
+        async function carregarFotoCapa() {
+            const container = document.getElementById('foto-capa-container');
+
+            // Primeiro tentar a foto "capa"
+            const caminhosCapa = [
+                'fotos/capa.jpg',
+                'fotos/CAPA.jpg',
+                'fotos/capa.jpeg',
+                'fotos/principal.jpg',
+                './fotos/capa.jpg',
+                'capa.jpg'
+            ];
+
+            for (const caminho of caminhosCapa) {
+                const resultado = await testarImagem(caminho);
+                if (resultado.existe) {
+                    const img = document.createElement('img');
+                    img.src = caminho;
+                    img.className = 'w-full h-full object-cover opacity-20';
+                    img.alt = 'Nossa foto especial';
+                    img.onload = () => {
+                        container.innerHTML = '';
+                        container.appendChild(img);
+                        container.classList.remove('foto-loading');
+                    };
+                    return;
+                }
+            }
+
+            // Se não encontrar, usar fallback
+            container.innerHTML = '';
+            container.classList.remove('foto-loading');
+            container.style.background = 'linear-gradient(135deg, #221013 0%, #3a1a21 100%)';
+        }
+
+        // Função para carregar timeline
+        function carregarTimeline() {
+            const container = document.getElementById('timeline-container');
+            const status = document.getElementById('status-timeline');
+
+            if (fotosEncontradas.timeline.length === 0) {
+                status.textContent = 'Nenhuma foto encontrada na pasta "fotos/"';
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <span class="material-symbols-outlined text-6xl text-white/30 mb-4">photo_library</span>
+                        <p class="text-white/50">Adicione fotos na pasta "fotos/" com nomes como:<br>primeiro-encontro.jpg, primeira-viagem.jpg, etc.</p>
+                        <p class="text-white/30 text-sm mt-4">Ou use fotos com nomes: foto1.jpg, foto2.jpg, etc.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            status.textContent = `Encontradas ${fotosEncontradas.timeline.length} memórias`;
+
+            let html = '';
+            fotosEncontradas.timeline.forEach((foto, index) => {
+                const lado = index % 2 === 0 ? 'justify-end' : 'justify-start';
+                const tilt = index % 2 === 0 ? 'polaroid-tilt-right' : 'polaroid-tilt-left';
+
+                html += `
+                    <div class="relative flex ${lado} items-center mb-16 md:mb-24 w-full">
+                        <div class="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 rounded-full bg-gold z-10 border-4 border-background-dark"></div>
+                        <div class="w-full md:w-[45%]">
+                            <div class="bg-parchment p-4 pb-12 shadow-2xl rounded-sm ${tilt} hover:rotate-0 transition-all duration-500 foto-container group">
+                                <div class="aspect-square bg-gray-200 mb-4 overflow-hidden relative">
+                                    <div class="foto-loading absolute inset-0 z-10">
+                                        <span class="material-symbols-outlined">photo</span>
+                                    </div>
+                                    <img src="${foto.caminho}" 
+                                         alt="${foto.descricao}"
+                                         class="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-500"
+                                         onload="this.parentElement.querySelector('.foto-loading').style.display = 'none'"
+                                         onerror="this.onerror=null; this.parentElement.querySelector('.foto-loading').style.display = 'flex'; this.src='https://picsum.photos/id/${100 + index}/400/400'">
+                                </div>
+                                <p class="font-handwriting text-gray-800 text-xl md:text-2xl text-center">${foto.titulo}</p>
+                                <p class="text-gray-500 text-xs text-center mt-2">${foto.descricao}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Função para carregar galeria
+        function carregarGaleria() {
+            const container = document.getElementById('galeria-container');
+            const status = document.getElementById('status-galeria');
+            const filtrosContainer = document.getElementById('filtros-container');
+
+            if (fotosEncontradas.galeria.length === 0) {
+                status.textContent = 'Nenhuma foto encontrada para a galeria';
+                container.innerHTML = `
+                    <div class="text-center py-12 col-span-full">
+                        <span class="material-symbols-outlined text-6xl text-white/30 mb-4">collections</span>
+                        <p class="text-white/50">Adicione fotos na pasta "fotos/" com nomes como:<br>galeria1.jpg, galeria2.jpg, etc.</p>
+                    </div>
+                `;
+                filtrosContainer.style.display = 'none';
+                return;
+            }
+
+            status.textContent = `Galeria: ${fotosEncontradas.galeria.length} fotos`;
+            filtrosContainer.style.display = 'flex';
+
+            let html = '';
+            fotosEncontradas.galeria.forEach((foto, index) => {
+                html += `
+                    <div class="galeria-item ${foto.categoria} foto-container rounded-lg overflow-hidden shadow-lg cursor-pointer group"
+                         onclick="abrirModal('${foto.caminho}', '${foto.titulo}')">
+                        <div class="aspect-square bg-gray-200 relative">
+                            <div class="foto-loading absolute inset-0 z-10">
+                                <span class="material-symbols-outlined">photo</span>
+                            </div>
+                            <img src="${foto.caminho}" 
+                                 alt="${foto.titulo}"
+                                 class="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-500"
+                                 onload="this.parentElement.querySelector('.foto-loading').style.display = 'none'"
+                                 onerror="this.onerror=null; this.parentElement.querySelector('.foto-loading').style.display = 'flex'; this.src='https://picsum.photos/id/${200 + index}/400/400'">
+                        </div>
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <p class="text-white text-sm font-medium truncate">${foto.titulo}</p>
+                            <p class="text-white/70 text-xs">${foto.categoria}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            atualizarContadorFotos();
+            configurarFiltros();
+        }
+
+        // Função para atualizar contador
+        function atualizarContadorFotos() {
+            const total = fotosEncontradas.timeline.length + fotosEncontradas.galeria.length;
+            document.getElementById('contador-fotos').textContent = total;
+            document.getElementById('info-fotos').textContent =
+                `Encontradas ${total} fotos (${fotosEncontradas.timeline.length} na timeline, ${fotosEncontradas.galeria.length} na galeria)`;
+        }
+
+        // Função para configurar filtros da galeria
+        function configurarFiltros() {
+            document.querySelectorAll('.filtro-galeria').forEach(botao => {
+                botao.addEventListener('click', function () {
+                    const filtro = this.getAttribute('data-filtro');
+
+                    // Atualizar botão ativo
+                    document.querySelectorAll('.filtro-galeria').forEach(b => {
+                        b.classList.remove('bg-primary', 'text-white');
+                        b.classList.add('bg-white/10', 'text-white');
+                    });
+                    this.classList.add('bg-primary', 'text-white');
+                    this.classList.remove('bg-white/10', 'text-white');
+
+                    // Filtrar itens
+                    document.querySelectorAll('.galeria-item').forEach(item => {
+                        if (filtro === 'todas' || item.classList.contains(filtro)) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        }
+
+        // Função para abrir modal
+        function abrirModal(src, titulo) {
+            const modal = document.getElementById('modal-foto');
+            const img = document.getElementById('modal-imagem');
+            const legenda = document.getElementById('modal-legenda');
+            const loading = document.getElementById('modal-loading');
+
+            loading.style.display = 'flex';
+            img.style.opacity = '0.5';
+
+            img.onload = function () {
+                loading.style.display = 'none';
+                img.style.opacity = '1';
+            };
+
+            img.onerror = function () {
+                loading.style.display = 'none';
+                img.style.opacity = '1';
+                legenda.innerHTML = `<span class="text-red-400">Erro ao carregar imagem</span><br>${titulo}`;
+            };
+
+            img.src = src;
+            legenda.textContent = titulo;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        // ============================================
+        // INICIALIZAÇÃO
+        // ============================================
+
+        async function inicializarSite() {
+            console.log('🚀 Inicializando site...');
+
+            // 1. Carregar foto de capa
+            await carregarFotoCapa();
+
+            // 2. Descobrir quais fotos existem
+            await descobrirFotos();
+
+            // 3. Carregar timeline e galeria
+            carregarTimeline();
+            carregarGaleria();
+
+            // 4. Configurar menu mobile
+            document.getElementById('menu-mobile').addEventListener('click', function () {
+                const nav = document.querySelector('nav');
+                nav.classList.toggle('hidden');
+                nav.classList.toggle('flex');
+                nav.classList.toggle('flex-col');
+                nav.classList.toggle('absolute');
+                nav.classList.toggle('top-16');
+                nav.classList.toggle('right-4');
+                nav.classList.toggle('bg-background-dark/95');
+                nav.classList.toggle('p-4');
+                nav.classList.toggle('rounded-lg');
+                nav.classList.toggle('shadow-xl');
+                nav.classList.toggle('z-50');
+                nav.classList.toggle('backdrop-blur-sm');
+            });
+
+            // 5. Configurar fechar modal
+            document.getElementById('fechar-modal').addEventListener('click', function () {
+                document.getElementById('modal-foto').classList.add('hidden');
+                document.getElementById('modal-foto').classList.remove('flex');
+            });
+
+            // 6. Fechar modal com ESC
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    document.getElementById('modal-foto').classList.add('hidden');
+                    document.getElementById('modal-foto').classList.remove('flex');
+                }
+            });
+
+            // 7. Fechar modal clicando fora
+            document.getElementById('modal-foto').addEventListener('click', function (e) {
+                if (e.target === this) {
+                    this.classList.add('hidden');
+                    this.classList.remove('flex');
+                }
+            });
+
+            console.log('✅ Site inicializado com sucesso!');
+        }
+
+        // ============================================
+        // ANIMAÇÃO DE CORAÇÕES
+        // ============================================
+
+        function spawnHeart(e) {
+            const heart = document.createElement('div');
+            heart.className = 'heart-particle';
+            heart.innerHTML = '❤️';
+            heart.style.left = (e ? e.clientX : Math.random() * window.innerWidth) + 'px';
+            heart.style.top = (e ? e.clientY : window.innerHeight) + 'px';
+            heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+            heart.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 3000);
+        }
+
+        setInterval(() => spawnHeart(null), 1500);
+
+        // ============================================
+        // BANCO DE DADOS SQL
+        // ============================================
+
+        const API_URL = 'http://localhost:3000/mensagens';
+
+        async function salvarNoSQL() {
+            const input = document.getElementById('textoMsg');
+            if (!input.value.trim()) return;
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ texto: input.value, autor: 'Amor' })
+                });
+                input.value = '';
+                carregarMensagens();
+            } catch (err) {
+                alert("Erro: O servidor SQL (node server.js) está rodando?\n\nPara usar o banco de dados, execute:\n1. npm init -y\n2. npm install express sqlite3\n3. Crie o arquivo server.js\n4. node server.js");
+            }
+        }
+
+        async function carregarMensagens() {
+            const mural = document.getElementById('muralSql');
+            try {
+                const res = await fetch(API_URL);
+                const dados = await res.json();
+                mural.innerHTML = dados.map(m => `
+                    <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-primary italic text-gray-700">
+                        "${m.texto}"
+                        <div class="text-[10px] mt-2 text-gray-400 uppercase tracking-tighter">${m.data}</div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                mural.innerHTML = `
+                    <div class="bg-white/10 p-4 rounded-lg italic text-white/50 col-span-full text-center">
+                        Servidor SQL offline. Para ativar:<br>
+                        <code class="text-xs block mt-2 bg-black/30 p-2 rounded">node server.js</code>
+                    </div>
+                `;
+            }
+        }
+
+        // ============================================
+        // EXECUTAR TUDO
+        // ============================================
+
+        document.addEventListener('DOMContentLoaded', function () {
+            inicializarSite();
+            carregarMensagens();
+        });
+
+        // Função para recarregar fotos (útil para debug)
+        window.recarregarFotos = async function () {
+            console.log('🔄 Recarregando fotos...');
+            await descobrirFotos();
+            carregarTimeline();
+            carregarGaleria();
+        };
+    </script>
+</body>
+
+</html>
